@@ -17,8 +17,9 @@
 
             <v-data-table :headers="headers" :items="todos" :search="search">
                 <template v-slot:[`item.actions`]="{ item }">
-                    <v-btn small class="mr-2" @click="editItem(item)">edit</v-btn>
-                    <v-btn small @click="deleteItem(item)">delete</v-btn>
+                    
+                    <v-btn small text icon class="mr-2" @click="editItem(item)"><v-icon color="blue">{{ icons.mdiPencil }}</v-icon></v-btn>
+                    <v-btn small text icon @click="deleteItem(item)"><v-icon  color="red">{{ icons.mdiDelete }}</v-icon></v-btn>
                 </template>
             </v-data-table>
         </v-card>
@@ -97,10 +98,23 @@
 </template>
 
 <script>
+    import {
+        mdiAccount,
+        mdiPencil,
+        mdiShareVariant,
+        mdiDelete,
+    } from '@mdi/js'
+
     export default {
         name: "List",
         data() {
             return {
+                icons: {
+                    mdiAccount,
+                    mdiPencil,
+                    mdiShareVariant,
+                    mdiDelete,
+                },
                 search: null,
                 dialog: false,
                 dialogEdit: false,
@@ -169,11 +183,12 @@
             editItem(item){
                 this.dialogEdit = true;
                 this.formTodo = {
-                    task: item,
-                    priority: item,
-                    note: item,
+                    task: item.task,
+                    priority: item.priority,
+                    note: item.note,
                 }
-            }
+            },
+            
         },
     };
 </script>
