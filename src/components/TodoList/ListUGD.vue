@@ -187,6 +187,7 @@
                     note: null,
                 };
             },
+            
             deleteItem(item){
                 this.todos.splice(item,1)
             },
