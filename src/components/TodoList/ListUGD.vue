@@ -15,10 +15,34 @@
                 <v-btn color="success" dark @click="dialog = true">Tambah</v-btn>
             </v-card-title>
 
-            <v-data-table :headers="headers" :items="todos" :search="search">
+            <v-data-table 
+                :headers="headers" 
+                :items="todos" 
+                :search="search" 
+                :single-expand="singleExpand"
+                :expanded.sync="expanded"
+                item-key="task"
+                show-expand
+                class="elevation-1"
+            >
+                <template v-slot:top>
+                    <v-toolbar flat>
+                        <v-spacer></v-spacer>
+                        <v-switch
+                        v-model="singleExpand"
+                        label="Single expand"
+                        class="mt-2"
+                        ></v-switch>
+                    </v-toolbar>
+                </template>
                 <template v-slot:[`item.actions`]="{ item }">
                     <v-btn small class="mr-2" @click="editItem(item)">edit</v-btn>
                     <v-btn small @click="deleteItem(item)">delete</v-btn>
+                </template>
+                <template v-slot:expanded-item="{ headers, item }">
+                <td :colspan="headers.length">
+                    {{ item.note }}
+                </td>
                 </template>
             </v-data-table>
         </v-card>
@@ -92,6 +116,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
     </v-main>
 </template>
 
@@ -102,7 +127,8 @@
             return {
                 search: null,
                 dialog: false,
-                dialogEdit: false,
+                expanded: [],
+                singleExpand: false,
                 headers: [
                     {
                         text: "Task",
@@ -162,7 +188,6 @@
                 };
             },
             deleteItem(item){
-                item=item-1;
                 this.todos.splice(item,1)
             },
             editItem(item){
@@ -173,6 +198,7 @@
                     note: item,
                 }
             }
+            
         },
     };
 </script>
