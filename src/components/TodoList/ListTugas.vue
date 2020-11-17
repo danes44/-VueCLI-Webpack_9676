@@ -12,39 +12,66 @@
                     hide-details>
                 </v-text-field>
                 <v-spacer></v-spacer>
+                <v-select
+                    v-model="sortTodo"
+                    :items="['Penting', 'Biasa', 'Tidak penting']"
+                    label="Sort Priority"
+                    dense
+                    outlined
+                    hide-details
+                    single-line
+                    class="pr-5"
+                >
+                </v-select>
                 <v-btn color="success" dark @click="dialog = true">Tambah</v-btn>
             </v-card-title>
 
             <template>
-            <v-data-table 
-                :headers="headers" 
-                :items="todos" 
-                :search="search" 
-                :single-expand="singleExpand"
-                :expanded.sync="expanded"
-                item-key="task"
-                show-expand
-                class="elevation-1"
-            >
-                <template v-slot:[`item.priority`]="{ item }">
-                    <v-chip :color="getColor(item)" outlined>
-                        {{ item.priority }}
-                    </v-chip>
-                </template>
-
-                <template v-slot:[`item.actions`]="{ item }">
+                <v-data-table 
+                    v-model="selected"
+                    :headers="headers" 
+                    :items="todos" 
+                    :search="search" 
+                    :expanded.sync="expanded"
                     
-                    <v-btn small text icon class="mr-2" @click="editItem(item)"><v-icon color="blue">{{ icons.mdiPencil }}</v-icon></v-btn>
-                    <v-btn small text icon @click="deleteItem(item)"><v-icon  color="red">{{ icons.mdiDelete }}</v-icon></v-btn>
-                </template>
-                <template v-slot:expanded-item="{ headers, item }">
-                    <td :colspan="headers.length" class="text-left pa-4">
-                        <h3>Note</h3>
-                        {{ item.note }}
-                    </td>
-                </template>
-            </v-data-table>
+                    item-key="task"
+                    show-expand
+                    show-select
+                    class="elevation-1"
+                >
+                    <template v-slot:[`item.priority`]="{ item }">
+                        <v-chip :color="getColor(item)" outlined>
+                            {{ item.priority }}
+                        </v-chip>
+                    </template>
+
+                    <template v-slot:[`item.actions`]="{ item }">
+                        
+                        <v-btn small text icon class="mr-2" @click="editItem(item)"><v-icon color="blue">{{ icons.mdiPencil }}</v-icon></v-btn>
+                        <v-btn small text icon @click="deleteItem(item)"><v-icon  color="red">{{ icons.mdiDelete }}</v-icon></v-btn>
+                    </template>
+                    <template v-slot:expanded-item="{ headers, item }">
+                        <td :colspan="headers.length" class="text-left pa-4">
+                            <h3>Note</h3>
+                            {{ item.note }}
+                        </td>
+                    </template>
+                </v-data-table>
             </template>
+        </v-card>
+
+        <v-card v-if="selected.length" class="text-left mt-5">
+            <v-card-text >
+                <v-container>
+                    <b>Multiple Delete:</b>
+                    <ul v-for="(select,i) in selected" :key="i">
+                        <li>{{ select.task }}</li>
+                    </ul>
+                </v-container>
+            </v-card-text>
+            <v-card-actions>
+                <v-btn color="red" class="ml-5 mb-5" outlined dense @click="deleteMultiple">Delete</v-btn>
+            </v-card-actions>
         </v-card>
 
         <v-dialog v-model="dialog" persistent max-width="600px">
@@ -121,7 +148,7 @@
         
         <v-dialog v-model="dialogDelete" persistent max-width="600px">
             <v-card>
-                <v-card-title class="headline">Are you sure you want to delete this item?</v-card-title>
+                <v-card-title class="headline text-center">Are you sure you want to delete this item?</v-card-title>
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
@@ -196,6 +223,8 @@
                     priority: null,
                     note: null,
                 },
+                selected: [],
+                tempIndex: null,
             };
         },
         methods: {
@@ -204,7 +233,7 @@
                 this.resetForm();
                 this.dialog = false;
             },
-            saveEdit(formTodo) {
+            saveEdit() {
                 // this.item.task = formTodo.task;
                 // this.item.priority = formTodo.priority;
                 // this.item.note = formTodo.note;
@@ -258,6 +287,13 @@
                 {
                     return "blue";
                 }
+            },
+            deleteMultiple(){
+                for(var i=0; i<this.selected.length; i++){
+                    this.tempIndex = this.todos.indexOf(this.selected[i]); //nyari todos dengan index yang sama kayak selected pada index i trus masukin ke tempIndex
+                    this.todos.splice(this.tempIndex,1); //delete pada index tersebut
+                }
+                this.selected = []
             }
         },
     };
